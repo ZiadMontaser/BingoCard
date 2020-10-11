@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "887434145098",
+    "firebase_url": "https://bingodealer-c112f.firebaseio.com",
+    "project_id": "bingodealer-c112f",
+    "storage_bucket": "bingodealer-c112f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:887434145098:android:29c35e2ab81e9f36d825b3",
+        "android_client_info": {
+          "package_name": "com.ziadmontaser.bingo_card"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "887434145098-kg3icpqnj6eo6soe0mkj672n59h8anr3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGsy9cEgZDa2tK-j_8IusOHFoUtFZ7uGA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "887434145098-kg3icpqnj6eo6soe0mkj672n59h8anr3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:887434145098:android:cefc3c620f12fd9ad825b3",
+        "android_client_info": {
+          "package_name": "nf.co.ziadmontaser.bingocard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "887434145098-kg3icpqnj6eo6soe0mkj672n59h8anr3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGsy9cEgZDa2tK-j_8IusOHFoUtFZ7uGA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "887434145098-kg3icpqnj6eo6soe0mkj672n59h8anr3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
