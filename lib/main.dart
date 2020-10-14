@@ -1,6 +1,7 @@
 import 'package:bingo_card/providers/auth.dart';
 import 'package:bingo_card/providers/avatars.dart';
 import 'package:bingo_card/providers/match.dart';
+import 'package:bingo_card/providers/match_maker.dart';
 import 'package:bingo_card/screens/auth_screen.dart';
 import 'package:bingo_card/screens/avaters_screen.dart';
 import 'package:bingo_card/screens/game_screen.dart';
@@ -28,41 +29,40 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => Avatars()),
         ChangeNotifierProvider(create: (_) => Auth()),
         ChangeNotifierProvider(create: (_) => Match()),
+        ChangeNotifierProvider(create: (_) => MatchMaker(_))
       ],
       child: Consumer<Auth>(
         builder: (context, auth, child) {
-          return FutureBuilder(
-            future: onStart(context, auth),
-            builder: (context, snapshot) {
-              bool isWaiting =
-                  snapshot.connectionState == ConnectionState.waiting;
-              return MaterialApp(
-                debugShowCheckedModeBanner: false,
-                theme: ThemeData(
-                  primarySwatch: Colors.cyan,
-                  accentColor: Colors.amber,
-                  textTheme: ThemeData.light().textTheme.copyWith(
-                        headline6: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                  iconTheme: ThemeData.light().iconTheme.copyWith(
-                        color: Colors.white,
-                      ),
-                  appBarTheme: AppBarTheme(
-                    iconTheme: IconThemeData(
-                      color: Colors.white,
-                    ),
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              primarySwatch: Colors.cyan,
+              accentColor: Colors.amber,
+              textTheme: ThemeData.light().textTheme.copyWith(
+                  // headline6: TextStyle(
+                  //   color: Colors.white,
+                  // ),
                   ),
+              iconTheme: ThemeData.light().iconTheme.copyWith(
+                    color: Colors.white,
+                  ),
+              appBarTheme: AppBarTheme(
+                iconTheme: IconThemeData(
+                  color: Colors.white,
                 ),
-                home: isWaiting ? SplashScreen() : HomeScreen(),
-                routes: {
-                  GameScreen.routeName: (_) => GameScreen(),
-                  AuthScreen.routeName: (_) => AuthScreen(),
-                  AvatersListScreen.routeName: (_) => AvatersListScreen(),
-                  ProfileScreen.routeName: (_) => ProfileScreen(),
-                },
-              );
+              ),
+            ),
+            home: auth.isAuth
+                ? HomeScreen()
+                : FutureBuilder(
+                    future: auth.trySignIn(),
+                    builder: (context, snapshot) => SplashScreen(),
+                  ),
+            routes: {
+              GameScreen.routeName: (_) => GameScreen(),
+              AuthScreen.routeName: (_) => AuthScreen(),
+              AvatersListScreen.routeName: (_) => AvatersListScreen(),
+              ProfileScreen.routeName: (_) => ProfileScreen(),
             },
           );
         },
@@ -70,9 +70,9 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  Future<void> onStart(BuildContext context, Auth auth) async {
-    // await Future.delayed(Duration(seconds: 3));
-    await Avatars.of(context, listen: false).fetchAndGetDate();
-    await auth.trySignIn();
-  }
+  // Future<void> onStart(BuildContext context, Auth auth) async {
+  //   // await Future.delayed(Duration(seconds: 3));
+  //   await Avatars.of(context, listen: false).fetchAndGetDate();
+  //   await auth.trySignIn();
+  // }
 }

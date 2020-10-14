@@ -1,3 +1,6 @@
+import 'dart:ffi';
+
+import 'package:bingo_card/models/player.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,9 +12,9 @@ class Match with ChangeNotifier {
   String matchId;
   bool isTurn;
   String playerTurnId;
+  List<Player> players = [];
   Map<String, bool> turns = {};
   Map<String, int> opponenetCardCount = {};
-  Map<String, bool> playersList = {};
   List<String> cards = [];
 
   FirebaseDatabase db = FirebaseDatabase.instance;
@@ -28,7 +31,6 @@ class Match with ChangeNotifier {
       final data = Map<String, dynamic>.from(event.snapshot.value);
       turns.clear();
       cards = [];
-      playersList.clear();
       opponenetCardCount.clear();
       isTurn = data['turn'] == uid;
       turns.addAll(Map<String, bool>.from(data['turns']));
@@ -36,7 +38,18 @@ class Match with ChangeNotifier {
       opponenetCardCount.addAll(Map<String, dynamic>.from(data['cards']).map(
           (key, value) =>
               MapEntry(key, Map<String, dynamic>.from(value).length)));
-      playersList.addAll(Map<String, bool>.from(data['players']));
+
+      players = List<dynamic>.from(data['players']).map((value) {
+        final playerData = Map<String, dynamic>.from(value);
+        final String playerId = playerData['id'];
+        return Player(
+          id: playerId,
+          cardCount: opponenetCardCount[playerId],
+          isConnected: playerData['connected'],
+          isLocal: playerId == uid,
+          isTurn: turns[playerId],
+        );
+      }).toList();
       notifyListeners();
     });
   }
