@@ -1,8 +1,10 @@
 import 'package:bingo_card/models/app_user.dart';
 import 'package:bingo_card/models/player.dart';
+import 'package:bingo_card/providers/match.dart';
 import 'package:bingo_card/widgets/mini_bingo_card.dart';
 import 'package:bingo_card/widgets/mini_profile.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 // class GridPlyersView extends StatelessWidget {
 //   const GridPlyersView({
@@ -81,31 +83,35 @@ import 'package:flutter/material.dart';
 class LinearPlayersView extends StatelessWidget {
   const LinearPlayersView({
     Key key,
-    @required this.players,
   }) : super(key: key);
-
-  final List<Player> players;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        if (players != null)
-          ...players.map(
-            (e) => Row(
-              children: [
-                MiniProfile(id: e.id),
-                RotatedBox(
-                  quarterTurns: 2,
-                  child: MiniBingoCard(
-                    text: '${e.cardCount}',
+    Match match = Match.of(context);
+    return LayoutBuilder(
+      builder: (context, constraints) => Container(
+        width: constraints.maxWidth,
+        height: 75,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: match.players.length,
+          itemBuilder: (context, index) {
+            final player = match.players[index];
+            return ChangeNotifierProvider.value(
+              value: player,
+              child: Row(
+                children: [
+                  MiniProfile(),
+                  RotatedBox(
+                    quarterTurns: 2,
+                    child: MiniBingoCard(),
                   ),
-                ),
-              ],
-            ),
-          ),
-      ],
+                ],
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 }

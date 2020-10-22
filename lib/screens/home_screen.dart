@@ -1,17 +1,15 @@
+import 'package:bingo_card/helpers/card_generator.dart';
 import 'package:bingo_card/providers/match_maker.dart';
 import 'package:bingo_card/screens/game_screen.dart';
 import 'package:bingo_card/providers/match.dart';
 import 'package:bingo_card/widgets/app_bar.dart';
 import 'package:bingo_card/widgets/main_drawer.dart';
 import 'package:bingo_card/widgets/matchmaking_bar.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,22 +19,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         width: double.infinity,
         height: double.infinity,
         child: Stack(
-          // alignment: Alignment.center,
-          // fit: StackFit.expand,
           children: [
             Positioned.fill(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Consumer<MatchMaker>(
+                    builder: (context, matchmaker, child) {
+                      return FlatButton(
+                          color: Theme.of(context).primaryColor,
+                          onPressed: matchmaker.isMatchMaking
+                              ? null
+                              : () => quickMatch(context),
+                          child: Text('Quick Match'));
+                    },
+                  ),
                   FlatButton(
                       color: Theme.of(context).primaryColor,
-                      onPressed: () => quickMatch(context),
-                      child: Text('Quick Match')),
-                  FlatButton(
-                      color: Theme.of(context).primaryColor,
-                      onPressed: () {
-                        // controller.forward();
-                      },
+                      onPressed: () {},
                       child: Text('Card')),
                 ],
               ),
@@ -49,7 +49,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void quickMatch(BuildContext context) {
-    MatchMaker.of(context, false).findMatch().catchError((e) {
+    MatchMaker.of(context, false).findMatch().then((value) {
+      return Navigator.of(context).pushNamed(GameScreen.routeName);
+    }).catchError((e) {
       showErrorDialog(context, message: e.toString());
     });
   }

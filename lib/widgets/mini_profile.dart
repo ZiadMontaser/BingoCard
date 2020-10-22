@@ -1,49 +1,40 @@
+import 'package:bingo_card/models/player.dart';
 import 'package:bingo_card/widgets/my_avatar.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class MiniProfile extends StatefulWidget {
-  final id;
-
-  const MiniProfile({
-    Key key,
-    this.id,
-  }) : super(key: key);
-
-  @override
-  _MiniProfileState createState() => _MiniProfileState();
-}
-
-class _MiniProfileState extends State<MiniProfile> {
-  String gamerTag;
-  String avatarUrl;
-
-  @override
-  void initState() {
-    profileRef.onValue.listen((event) {
-      final data = Map<String, dynamic>.from(event.snapshot.value);
-
-      gamerTag = data['gamerTag'];
-      avatarUrl = data['avatarUrl'];
-    });
-    super.initState();
-  }
-
-  DatabaseReference get profileRef {
-    return FirebaseDatabase.instance.reference().child('users/${widget.id}');
-  }
-
+class MiniProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        MyAvatar(
-          url: avatarUrl,
-          radius: 20,
-        ),
-        if (gamerTag != null) Text(gamerTag),
-      ],
+    final player = Provider.of<Player>(context);
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          MyAvatar(
+            url: player.avatarUrl,
+            radius: 20,
+          ),
+          if (player.gamerTag != null)
+            Expanded(
+              child: Container(
+                width: 50,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    player.gamerTag,
+                    style: TextStyle(
+                      color: player.isTurn
+                          ? Colors.green
+                          : Theme.of(context).errorColor,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

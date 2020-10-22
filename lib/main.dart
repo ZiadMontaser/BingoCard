@@ -28,7 +28,6 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => Avatars()),
         ChangeNotifierProvider(create: (_) => Auth()),
-        ChangeNotifierProvider(create: (_) => Match()),
         ChangeNotifierProvider(create: (_) => MatchMaker(_))
       ],
       child: Consumer<Auth>(

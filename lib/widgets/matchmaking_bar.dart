@@ -25,46 +25,46 @@ class _MatchMakingBarState extends State<MatchMakingBar>
     );
     animation = Tween<Offset>(begin: Offset(0, -1.5), end: Offset(0, 0.7))
         .animate(controller);
-    controller.forward();
+    // controller.forward();
+    MatchMaker.of(context, false).addListener(onMatchMakerChange);
+  }
+
+  onMatchMakerChange() {
+    final matchMaker = MatchMaker.of(context, false);
+    if (matchMaker.isMatchMaking) {
+      controller.forward();
+    } else {
+      controller.reverse();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Consumer<MatchMaker>(
-        builder: (context, value, child) {
-          if (value.isMatchMaking) {
-            controller.forward();
-          } else {
-            controller.reverse();
-          }
-          return child;
-        },
-        child: SlideTransition(
-          position: Tween<Offset>(begin: Offset(0, -1.5), end: Offset(0, -0.25))
-              .animate(controller),
-          child: Material(
-            borderRadius: BorderRadius.only(
-              bottomLeft: const Radius.circular(20),
-              bottomRight: const Radius.circular(20),
-            ),
-            elevation: 4,
-            color: Theme.of(context).primaryColor,
-            // textStyle: Theme.of(context).appBarTheme.textTheme.headline6,
-            child: Padding(
-              padding:
-                  const EdgeInsets.only(right: 8, left: 8, top: 16, bottom: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(
-                    'Searching for players',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  CircularProgressIndicator(),
-                  FlatButton(onPressed: () {}, child: Text('Cansle'))
-                ],
-              ),
+      child: SlideTransition(
+        position: Tween<Offset>(begin: Offset(0, -1.5), end: Offset(0, -0.25))
+            .animate(controller),
+        child: Material(
+          borderRadius: BorderRadius.only(
+            bottomLeft: const Radius.circular(20),
+            bottomRight: const Radius.circular(20),
+          ),
+          elevation: 4,
+          color: Theme.of(context).primaryColor,
+          // textStyle: Theme.of(context).appBarTheme.textTheme.headline6,
+          child: Padding(
+            padding:
+                const EdgeInsets.only(right: 8, left: 8, top: 16, bottom: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text(
+                  'Searching for players',
+                  style: TextStyle(color: Colors.white),
+                ),
+                CircularProgressIndicator(),
+                FlatButton(onPressed: () {}, child: Text('Cansle'))
+              ],
             ),
           ),
         ),

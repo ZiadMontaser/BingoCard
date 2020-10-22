@@ -15,14 +15,7 @@ class BingoCardCell extends StatelessWidget {
       color: cell.isPressed ? Colors.green : null,
       child: InkWell(
         onTap: () async {
-          try {
-            await cell.toggle(context);
-          } catch (e) {
-            Scaffold.of(context).hideCurrentSnackBar();
-            Scaffold.of(context).showSnackBar(SnackBar(
-                duration: Duration(seconds: 1), content: Text(e.message)));
-          }
-          onTap(cell);
+          await cell.toggle(context);
         },
         child: Ink(
           child: FittedBox(

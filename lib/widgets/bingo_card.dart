@@ -1,5 +1,3 @@
-import 'dart:async';
-import 'package:bingo_card/models/card_data.dart';
 import 'package:bingo_card/providers/auth.dart';
 import 'package:bingo_card/providers/match.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -52,54 +50,40 @@ class _BingoCardState extends State<BingoCard> {
   List<Cell> cells = [];
   int count = 0;
 
-  StreamSubscription<Event> cardListener;
-
   @override
   void initState() {
     super.initState();
-    // final temp = CardGenerator.card();
-
     final match = Match.of(context, false);
-    final auth = Auth.of(context, listen: false);
-    cardRef = FirebaseDatabase.instance.reference().child(
-        'matches/${match.matchId}/cards/${auth.user.uid}/${widget.cardId}');
+    cardRef = match.gameRef.child('cards/${widget.cardId}');
 
-    cardListener = cardRef.onValue.listen((event) {
-      final data = event.snapshot.value;
-      if (data == null) return;
-      final list = List<dynamic>.from(data);
-      final CardData card = CardData.fromMap(widget.cardId, list);
-      setState(() {
-        cells = card.cells;
-      });
-    });
-
-    //formating list to be displayed well
-    // for (int a = 0; a < 5; a++) {
-    //   for (var i = 0; i < 5; i++) {
-    //     final cell = temp[i * 5 + a];
-    //     cells.add(cell);
-    //   }
-    // }
-    // FirebaseDatabase.instance
-    //     .reference()
-    //     .child('matches/test-match/cards/e4CblxQbfSWzI8WvfzArLeLKDYf2/card1')
-    //     .set(cells.map((element) => element.toMap()).toList());
+    cardRef.child('value').orderByChild('id').onValue.listen(fetchData);
   }
 
-  @override
-  void dispose() {
-    cardListener?.cancel();
-    super.dispose();
+  void fetchData(Event event) async {
+    cells.clear();
+    Map<String, dynamic>.from(event.snapshot.value).forEach(
+      (key, value) {
+        final cellData = Map<String, dynamic>.from(value);
+
+        cells.add(Cell(
+          number: int.parse(key),
+          isPressed: cellData['isPressed'],
+          id: cellData['id'],
+        ));
+      },
+    );
+    Cell.sort(cells);
+
+    onCellChanged(null);
   }
 
-  void onCellChanged(Cell cell) async {
-    int c = 0;
-    widget.conditions.forEach((condition) {
-      if (condition.checkCondition(cells)) c++;
-    });
+  void onCellChanged(Cell pressedCell) async {
     setState(() {
-      count = c;
+      count = BingoCondition.checkForAll(
+        widget.conditions,
+        cells,
+        pressedCell,
+      );
     });
   }
 
@@ -144,27 +128,25 @@ class _BingoCardState extends State<BingoCard> {
               borderRadius: BorderRadius.all(
                 Radius.circular(widget.borderRadius),
               ),
-              child: Container(
-                child: GridView(
-                  semanticChildCount: 25,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: widget.columns,
-                    childAspectRatio: x / y,
-                  ),
-                  children: [
-                    ...cells
-                        .map(
-                          (cell) => ChangeNotifierProvider.value(
-                            value: Cell.withCard(cell, cardRef),
-                            child: BingoCardCell(
-                              onTap: onCellChanged,
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ],
+              child: GridView(
+                semanticChildCount: 25,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: widget.columns,
+                  childAspectRatio: x / y,
                 ),
+                children: [
+                  ...cells
+                      .map(
+                        (cell) => ChangeNotifierProvider.value(
+                          value: cell,
+                          child: BingoCardCell(
+                            onTap: onCellChanged,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ],
               ),
             );
           },

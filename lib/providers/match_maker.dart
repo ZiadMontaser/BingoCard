@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
+import 'match.dart';
 
 class MatchMaker with ChangeNotifier {
   static const NONE = 'none';
@@ -17,6 +18,8 @@ class MatchMaker with ChangeNotifier {
 
   bool isMatchMaking = false;
   bool isInGame = false;
+
+  Match currentMatch;
 
   MatchMaker(BuildContext context) {
     _auth = Auth.of(context, listen: false);
@@ -32,7 +35,7 @@ class MatchMaker with ChangeNotifier {
     if (isMatchMaking || isInGame) return Future.error('You allready started');
     isMatchMaking = true;
     notifyListeners();
-    await Future.delayed(Duration(seconds: 30));
+    // /*TODO: remove this line */ await Future.delayed(Duration(seconds: 30));
     final value = await _matchMakerRef.once();
     final matchmaker = value.value.toString();
     if (matchmaker == NONE) {
@@ -71,6 +74,7 @@ class MatchMaker with ChangeNotifier {
 
     if (result.committed) {
       isInGame = true;
+      OnJoindMatch(matchId);
       return matchId;
     } else {
       isInGame = false;
@@ -89,7 +93,7 @@ class MatchMaker with ChangeNotifier {
         return Future.error('Some Thing Went Wrong');
       },
     );
-    print(result.committed ? 'great work : $matchMaker' : 'Try Later');
+    // print(result.committed ? 'great work : $matchMaker' : 'Try Later');
     isMatchMaking = false;
     notifyListeners();
 
@@ -99,10 +103,15 @@ class MatchMaker with ChangeNotifier {
         'id': _auth.user.uid,
         'connected': true,
       });
+      OnJoindMatch(matchMaker);
       return matchMaker;
     } else {
       isInGame = false;
       return Future.error('Some Thing Went Wrong');
     }
+  }
+
+  void OnJoindMatch(String machId) {
+    currentMatch = Match('-MJfB2U8kQw2Cd1y-_Wa');
   }
 }

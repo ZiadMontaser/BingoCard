@@ -1,4 +1,6 @@
+import 'package:bingo_card/models/player.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class MiniBingoCard extends StatelessWidget {
   final double width;
@@ -14,6 +16,7 @@ class MiniBingoCard extends StatelessWidget {
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    final player = Provider.of<Player>(context);
     return RotatedBox(
       quarterTurns: rotate,
       child: Container(
@@ -43,10 +46,13 @@ class MiniBingoCard extends StatelessWidget {
                 child: FittedBox(
                   alignment: Alignment.center,
                   fit: BoxFit.scaleDown,
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                  child: RotatedBox(
+                    quarterTurns: 2,
+                    child: Text(
+                      'x${player.cardCount}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
